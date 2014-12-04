@@ -10,7 +10,7 @@
         </style>
     </head>
     <body>
-        <h1>Customized EventDrops Chart</h1>z
+        <h1>Text Mirror</h1>
         <p>Charts can have custom color lines, width, margins, date locale, etc. Check the source to see how to customize a <code>d3.chart.eventDrops()</code>.</p>
         <div style="text-align: center">
             <label for="delimiter">Show time boundaries:</label>
@@ -24,7 +24,7 @@
         <script src="/static/js/eventDrops.js"></script>
         <script>
             var chartPlaceholder = document.getElementById('chart_placeholder');
-            var names = ["Reverse Proxy hits", "Server requests", "SQL queries", "Cache invalidations", "Cache miss", "Builds", "Websocket messages", "API calls", "Autoscaling", "Incidents", "Explosions", "Ends of the world"];
+            var names = ["Received", "Sent", "SQL queries", "Cache invalidations", "Cache miss", "Builds", "Websocket messages", "API calls", "Autoscaling", "Incidents", "Explosions", "Ends of the world"];
 
             var data = [];
             var endTime = Date.now();
@@ -59,10 +59,10 @@
                 "date": "%d/%m/%Y",
                 "time": "%H:%M:%S",
                 "periods": ["AM", "PM"],
-                "days": ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"],
-                "shortDays": ["dim.", "lun.", "mar.", "mer.", "jeu.", "ven.", "sam."],
-                "months": ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"],
-                "shortMonths": ["janv.", "févr.", "mars", "avril", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."]
+                "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+                "shortDays": ["Mon.", "Tue.", "Wed.", "Thu.", "Fri.", "Sat.", "Sun."],
+                "months": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+                "shortMonths": ["Jan.", "Feb.", "Mar.", "Apr.", "May", "Jun.", "Jul.", "Aug.", "Sept.", "Oct.", "Nov.", "Dec."]
             });
 
             var graph = d3.chart.eventDrops()
