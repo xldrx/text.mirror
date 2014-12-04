@@ -51,18 +51,25 @@ def filter_message(messages=None):
 
 
 def save_first_names(messages):
-    names = set([m['to'] for m in messages] + [m['from'] for m in messages])
-    first_names = set([m[0] for m in names])
+    names = get_name_dict()
+    all_names = set([m['to'] for m in messages] + [m['from'] for m in messages])
+    first_names = set([m[0] for m in all_names])
     with open("first_name.csv", "w") as fp:
         for name in sorted(first_names):
-            fp.write("%s\tm\n" % name)
+            if name not in names:
+                fp.write("%s\tm\n" % name)
 
 
-def add_gender(messages):
+def get_name_dict():
     names = {}
     with open("first_name.csv", "r") as fp:
         for row in csv.reader(fp, delimiter='\t'):
             names[row[0].lower()] = row[1]
+    return names
+
+
+def add_gender(messages):
+    names = get_name_dict()
 
     for m in messages:
 
@@ -79,11 +86,14 @@ def add_sender_status(messages):
     for m in messages:
         m['is_sender'] = True if m['from'] == "Me" else False
 
+    return messages
+
 
 if __name__ == "__main__":
     messages = filter_message()
     messages = add_gender(messages)
     messages = add_sender_status(messages)
+    save_first_names(messages)
     with open("../messages.json", "a") as fp:
         json.dump(messages, fp, indent=4, separators=(',', ': '))
 
