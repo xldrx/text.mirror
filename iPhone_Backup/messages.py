@@ -35,4 +35,4 @@ def get_messages():
 if __name__ == "__main__":
     messages = get_messages()
     with open("../messages.json", "w") as fp:
-        json.dump(messages, fp)
+        json.dump(messages, fp, indent=4, separators=(',', ': '))
