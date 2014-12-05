@@ -11,9 +11,15 @@
     </head>
     <body>
         <h1>Text Mirror</h1>
-        <p>Charts can have custom color lines, width, margins, date locale, etc. Check the source to see how to customize a <code>d3.chart.eventDrops()</code>.</p>
+        <p>A tool for analyzing your text messages!</p>
         <div style="text-align: center">
-            <label for="delimiter">Show time boundaries:</label>
+            <label for="delimiter">Choose a contact:</label>
+            <select id="dropdown">
+{#                <option value="volvo">Volvo</option>#}
+{#                <option value="saab">Saab</option>#}
+{#                <option value="opel">Opel</option>#}
+{#                <option value="audi">Audi</option>#}
+            </select>
             <input name="delimiter" type="checkbox" checked="true" onchange="updateDelimiter()">
             <button onclick="addLine()">Add line</button>
             <button onclick="removeLine()">Remove line</button>
@@ -24,7 +30,7 @@
         <script src="/static/js/eventDrops.js"></script>
         <script>
             var chartPlaceholder = document.getElementById('chart_placeholder');
-            var names = ["Received", "Sent", "SQL queries", "Cache invalidations", "Cache miss", "Builds", "Websocket messages", "API calls", "Autoscaling", "Incidents", "Explosions", "Ends of the world"];
+            var names = ["Received", "Sent", "Received", "Sent","Received", "Sent","Received", "Sent","Received", "Sent"];
 
             var data = [];
             var endTime = Date.now();
@@ -36,16 +42,30 @@
                 event.name = name;
                 event.dates = [];
 
-                var max =  Math.floor(Math.random() * 200);
-                for (var j = 0; j < max; j++) {
-                    var time = Math.floor((Math.random() * oneMonth)) + startTime;
-                    event.dates.push(new Date(time));
-                }
+                d3.json("/static/messages.json", function(error, json) {
+                    for(var i = 0; i<20; i++){
+                        document.getElementById("dropdown").innerHTML += '<option value="contact">'+json[i].from[0]+'</option>';
+
+
+                        if(json[i].to[0] == "Katayoun") {
+                            event.dates.push(new Date(json[i].date));
+                        }
+                    }
+                });
+
+{#                var max =  Math.floor(Math.random() * 200);#}
+{#                for (var j = 0; j < max; j++) {#}
+{#                    var time = Math.floor((Math.random() * oneMonth)) + startTime;#}
+{#                    console.log(new Date(time));#}
+{#                    event.dates.push(new Date(time));#}
+{#                }#}
 
                 return event;
             }
 
-            for (var i = 0; i < 6; i++) {
+
+
+            for (var i = 0; i < 2; i++) {
                 data.push(createEvent(names[i]));
             }
 
@@ -72,7 +92,7 @@
                 .eventColor(function (datum, index) {
                     return color(index);
                 })
-                .width(800)
+                .width(1000)
                 .margin({ top: 100, left: 200, bottom: 0, right: 0 })
                 .axisFormat(function(xAxis) {
                     xAxis.ticks(5);
@@ -93,8 +113,9 @@
             var addLine = function () {
                 var data = element.datum();
                 var i = data.length;
+                console.log(i);
                 data.push(createEvent(names[i]));
-                elements = element.datum(data);
+                element = element.datum(data);
                 graph(element);
             }
 
