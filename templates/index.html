@@ -28,6 +28,9 @@
         <div style="text-align: center" id="legend"></div>
         <script src="/static/js/d3.min.js"></script>
         <script src="/static/js/eventDrops.js"></script>
+        <script src="/static/js/jquery-1.11.1.min.js"></script>
+        <script src="/static/js/jquery-ui.js"></script>
+
         <script>
             var chartPlaceholder = document.getElementById('chart_placeholder');
             var names = ["Received", "Sent", "Received", "Sent","Received", "Sent","Received", "Sent","Received", "Sent"];
@@ -43,14 +46,17 @@
                 event.dates = [];
 
                 d3.json("/static/messages.json", function(error, json) {
-                    for(var i = 0; i<20; i++){
-                        document.getElementById("dropdown").innerHTML += '<option value="contact">'+json[i].from[0]+'</option>';
-
+                    $.ajax({url:"/get/contacts", type:"GET", dataType:"json"})
+                        .done(function(data){
+                            for(var i = 0; i < data.length; i++){
+                            document.getElementById("dropdown").innerHTML += '<option value="contact">'+data[i]+'</option>';
+                        }
+                    });
 
                         if(json[i].to[0] == "Katayoun") {
                             event.dates.push(new Date(json[i].date));
                         }
-                    }
+
                 });
 
 {#                var max =  Math.floor(Math.random() * 200);#}
