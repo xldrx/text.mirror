@@ -3,11 +3,12 @@
 import csv
 import json
 import re
+import dateutil.parser
 from iPhone_Backup.contacts import get_contacts
 
 __author__ = 'xl'
 
-from iPhone_Backup._sms_backup import main, strip, trunc
+from iPhone_Backup._sms_backup import main, trunc
 
 
 def alias_generator(contacts):
@@ -89,12 +90,22 @@ def add_sender_status(messages):
     return messages
 
 
+def fix_dates(messages):
+    for m in data:
+        m['date'] = dateutil.parser.parse(m['date'])
+    return messages
+
+def get_processed_messages():
+    ret = filter_message()
+    ret = add_gender(ret)
+    ret = add_sender_status(ret)
+    return ret
+
+
 if __name__ == "__main__":
-    messages = filter_message()
-    messages = add_gender(messages)
-    messages = add_sender_status(messages)
-    save_first_names(messages)
+    data = get_processed_messages()
+    save_first_names(data)
     with open("../messages.json", "a") as fp:
-        json.dump(messages, fp, indent=4, separators=(',', ': '))
+        json.dump(data, fp, indent=4, separators=(',', ': '))
 
         # save_first_names(messages)

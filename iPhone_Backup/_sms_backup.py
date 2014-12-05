@@ -24,13 +24,13 @@ import csv
 import cStringIO
 import fnmatch
 import json
-import logging
 import os
 import re
 import shutil
 import sqlite3
 import sys
 import tempfile
+#XL import logging
 
 from datetime import datetime
 
@@ -46,14 +46,14 @@ except NameError:
 
 # silence Python 2.6 buggy warnings about Exception.message
 # See: http://code.google.com/p/argparse/issues/detail?id=25
-if sys.version_info[:2] == (2, 6):
-    import warnings
-
-    warnings.filterwarnings(action='ignore',
-                            message="BaseException.message has been "
-                                    "deprecated as of Python 2.6",
-                            category=DeprecationWarning,
-                            module='argparse')
+# if sys.version_info[:2] == (2, 6):
+#     import warnings
+#
+#     warnings.filterwarnings(action='ignore',
+#                             message="BaseException.message has been "
+#                                     "deprecated as of Python 2.6",
+#                             category=DeprecationWarning,
+#                             module='argparse')
 
 # Global variables
 ORIG_DB = 'test.db'
@@ -247,12 +247,12 @@ def find_sms_db():
                 path = os.path.join(root, basename)
                 paths.append(path)
     if len(paths) == 0:
-        logging.warning("No SMS db found.")
+        #XL logging.warning("No SMS db found.")
         path = None
     elif len(paths) == 1:
         path = paths[0]
     else:
-        logging.warning("Multiple SMS dbs found. Using most recent db.")
+        #XL logging.warning("Multiple SMS dbs found. Using most recent db.")
         path = most_recent(paths)
     return path
 
@@ -262,20 +262,20 @@ def copy_sms_db(db):
     try:
         orig = open(db, 'rb')
     except:
-        logging.error("Unable to open DB file: %s" % db)
+        #XL logging.error("Unable to open DB file: %s" % db)
         sys.exit(1)
 
     try:
         copy = tempfile.NamedTemporaryFile(delete=False)
     except:
-        logging.error("Unable to make tmp file.")
+        #XL logging.error("Unable to make tmp file.")
         orig.close()
         sys.exit(1)
 
     try:
         shutil.copyfileobj(orig, copy)
     except:
-        logging.error("Unable to copy DB.")
+        #XL logging.error("Unable to copy DB.")
         sys.exit(1)
     finally:
         orig.close()
@@ -447,8 +447,10 @@ def imessage_date(row):
 def convert_date(unix_date, format):
     """Convert unix epoch time string to formatted date string."""
     dt = datetime.fromtimestamp(int(unix_date))
-    ds = dt.strftime(format)
-    return ds.decode('utf-8')
+    #XL
+    return dt
+    # ds = dt.strftime(format)
+    # return ds.decode('utf-8')
 
 
 def convert_date_ios6(unix_date, format):
@@ -573,16 +575,13 @@ def skip_sms(row):
     """Return True, if sms row should be skipped."""
     retval = False
     if row['flags'] not in (2, 3):
-        logging.info("Skipping msg (%s) not sent. Address: %s. Text: %s." % \
-                     (row['rowid'], row['address'], row['text']))
+        #XL logging.info("Skipping msg (%s) not sent. Address: %s. Text: %s." % (row['rowid'], row['address'], row['text']))
         retval = True
     elif not row['address']:
-        logging.info("Skipping msg (%s) without address. "
-                     "Text: %s" % (row['rowid'], row['text']))
+        #XL logging.info("Skipping msg (%s) without address. Text: %s" % (row['rowid'], row['text']))
         retval = True
     elif not row['text']:
-        logging.info("Skipping msg (%s) without text. Address: %s" % \
-                     (row['rowid'], row['address']))
+        #XL logging.info("Skipping msg (%s) without text. Address: %s" % (row['rowid'], row['address']))
         retval = True
     return retval
 
@@ -610,35 +609,27 @@ def skip_imessage(row):
     flags_whitelist = (36869, 102405, 12289, 77825)
     retval = False
     if row['madrid_error'] != 0:
-        logging.info("Skipping msg (%s) with error code %s. Address: %s. "
-                     "Text: %s" % (row['rowid'], row['madrid_error'],
-                                   row['address'], row['text']))
+        #XL logging.info("Skipping msg (%s) with error code %s. Address: %s. Text: %s" % (row['rowid'], row['madrid_error'], row['address'], row['text']))
         retval = True
     elif row['madrid_flags'] in flags_group_msgs:
-        logging.info("Skipping msg (%s). Don't handle iMessage group chat. "
-                     "Text: %s" % (row['rowid'], row['text']))
+        #XL logging.info("Skipping msg (%s). Don't handle iMessage group chat. Text: %s" % (row['rowid'], row['text']))
         retval = True
     elif row['madrid_flags'] not in flags_whitelist:
-        logging.info("Skipping msg (%s). Don't understand madrid_flags: %s. "
-                     "Text: %s" % (row['rowid'], row['madrid_flags'],
-                                   row['text']))
+        #XL logging.info("Skipping msg (%s). Don't understand madrid_flags: %s. Text: %s" % (row['rowid'], row['madrid_flags'], row['text']))
         retval = True
     elif not row['madrid_handle']:
-        logging.info("Skipping msg (%s) without address. "
-                     "(Probably iMessage group chat.) "
-                     "Text: %s" % (row['rowid'], row['text']))
+        #XL logging.info("Skipping msg (%s) without address. (Probably iMessage group chat.) Text: %s" % (row['rowid'], row['text']))
         retval = True
     elif not row['text']:
-        logging.info("Skipping msg (%s) without text. Address: %s" % \
-                     (row['rowid'], row['address']))
+        #XL logging.info("Skipping msg (%s) without text. Address: %s" % (row['rowid'], row['address']))
         retval = True
     return retval
 
 
 def get_messages(cursor, query, params, aliases, cmd_args):
     cursor.execute(query, params)
-    logging.debug("Run query: %s" % (query))
-    logging.debug("With query params: %s" % (params,))
+    #XL logging.debug("Run query: %s" % (query))
+    #XL logging.debug("With query params: %s" % (params,))
 
     messages = []
     for row in cursor:
@@ -661,8 +652,8 @@ def get_messages(cursor, query, params, aliases, cmd_args):
 
 def get_messages_ios6(cursor, query, params, aliases, cmd_args):
     cursor.execute(query, params)
-    logging.debug("Run query: %s" % (query))
-    logging.debug("With query params: %s" % (params,))
+    #XL logging.debug("Run query: %s" % (query))
+    #XL logging.debug("With query params: %s" % (params,))
 
     messages = []
     for row in cursor:
@@ -764,18 +755,19 @@ def output(messages, out_file, format, header):
 def main(input_args=None, aliases=None):
     parser = argparse.ArgumentParser()
     args = setup_and_parse(parser, input_args)
+
     try:
         validate(args)
     except:
         parser.print_help()
         sys.exit(2)  # bash builtins return 2 for incorrect usage.
 
-    if args.quiet:
-        logging.basicConfig(level=logging.WARNING)
-    elif args.verbose:
-        logging.basicConfig(level=logging.DEBUG)
-    else:
-        logging.basicConfig(level=logging.INFO)
+    # if args.quiet:
+    #     #XL logging.basicConfig(level=#XL logging.WARNING)
+    # elif args.verbose:
+    #     #XL logging.basicConfig(level=#XL logging.DEBUG)
+    # else:
+    #     #XL logging.basicConfig(level=#XL logging.INFO)
 
     global ORIG_DB, COPY_DB
     ORIG_DB = args.db_file or find_sms_db()
@@ -804,14 +796,14 @@ def main(input_args=None, aliases=None):
             return messages
 
     except sqlite3.Error as e:
-        logging.error("Unable to access %s: %s" % (COPY_DB, e))
+        #XL logging.error("Unable to access %s: %s" % (COPY_DB, e))
         sys.exit(1)
     finally:
         if conn:
             conn.close()
         if COPY_DB:
             os.remove(COPY_DB)
-            logging.debug("Deleted COPY_DB: %s" % COPY_DB)
+            #XL logging.debug("Deleted COPY_DB: %s" % COPY_DB)
 
 
 if __name__ == '__main__':

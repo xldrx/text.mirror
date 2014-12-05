@@ -8,11 +8,10 @@ import os
 import re
 import sys
 import fnmatch
-import logging
+# import logging
 import shutil
 import tempfile
 
-from time import localtime, strftime
 
 # Global variables
 ORIG_DB = 'test.db'
@@ -36,12 +35,12 @@ def find_contacts_db():
                 path = os.path.join(root, basename)
                 paths.append(path)
     if len(paths) == 0:
-        logging.warning("No SMS db found.")
+        #XL logging.warning("No SMS db found.")
         path = None
     elif len(paths) == 1:
         path = paths[0]
     else:
-        logging.warning("Multiple SMS dbs found. Using most recent db.")
+        #XL logging.warning("Multiple SMS dbs found. Using most recent db.")
         path = most_recent(paths)
     return path
 
@@ -51,20 +50,20 @@ def copy_contacts_db(db):
     try:
         orig = open(db, 'rb')
     except:
-        logging.error("Unable to open DB file: %s" % db)
+        #XL logging.error("Unable to open DB file: %s" % db)
         sys.exit(1)
 
     try:
         copy = tempfile.NamedTemporaryFile(delete=False)
     except:
-        logging.error("Unable to make tmp file.")
+        #XL logging.error("Unable to make tmp file.")
         orig.close()
         sys.exit(1)
 
     try:
         shutil.copyfileobj(orig, copy)
     except:
-        logging.error("Unable to copy DB.")
+        #XL logging.error("Unable to copy DB.")
         sys.exit(1)
     finally:
         orig.close()
@@ -88,27 +87,17 @@ def get_contacts():
         for value, first, last in cur.fetchall():
             contacts.append(((first, last), normalize(value)))
 
-        # groups = {}
-        # for address, date, text, flags in fetchall(sms, 'SELECT address, date, text, flags FROM message'):
-        # address = normalize(address)
-        #     assert address
-        #     conversation = (strftime('%Y-%m-%d %H:%M:%S %a', localtime(date)), text, flags)
-        #     if address in groups:
-        #         groups[address].append(conversation)
-        #     else:
-        #         groups[address] = [conversation]
-
         return contacts
 
     except sqlite3.Error as e:
-        logging.error("Unable to access %s: %s" % (COPY_DB, e))
+        #XL logging.error("Unable to access %s: %s" % (COPY_DB, e))
         sys.exit(1)
     finally:
         if conn:
             conn.close()
         if COPY_DB:
             os.remove(COPY_DB)
-            logging.debug("Deleted COPY_DB: %s" % COPY_DB)
+            #XL logging.debug("Deleted COPY_DB: %s" % COPY_DB)
 
 
 def normalize(address):
