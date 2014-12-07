@@ -15,10 +15,7 @@
         <div style="text-align: center">
             <label for="delimiter">Choose a contact:</label>
             <select id="dropdown">
-{#                <option value="volvo">Volvo</option>#}
-{#                <option value="saab">Saab</option>#}
-{#                <option value="opel">Opel</option>#}
-{#                <option value="audi">Audi</option>#}
+                <option value="Sadaf">Sadaf</option>
             </select>
             <input name="delimiter" type="checkbox" checked="true" onchange="updateDelimiter()">
             <button onclick="addLine()">Add line</button>
@@ -33,30 +30,31 @@
 
         <script>
             var chartPlaceholder = document.getElementById('chart_placeholder');
-            var names = ["Received", "Sent", "Received", "Sent","Received", "Sent","Received", "Sent","Received", "Sent"];
+            var names = ["Received Messages: ", "Sent Messages: ", "Received Messages: ", "Sent Messages: ", "Received Messages: ", "Sent Messages: ", "Received Messages: ", "Sent Messages: ","Received Messages: ", "Sent Messages: ","Received Messages: ", "Sent Messages: "];
 
             var data = [];
             var endTime = Date.now();
             var oneMonth = 30 * 24 * 60 * 60 * 1000;
             var startTime = endTime - oneMonth;
+            $.ajax({url:"/get/contacts", type:"GET", dataType:"json"})
+                .done(function(data){
+                    for(var i = 0; i < data.length; i++){
+                    document.getElementById("dropdown").innerHTML += '<option value="'+data[i][1]+'">'+data[i][1]+'</option>';
+                }
+            });
+
+
 
             function createEvent (name) {
                 var event = {};
                 event.name = name;
                 event.dates = [];
-
                 d3.json("/static/messages.json", function(error, json) {
-                    $.ajax({url:"/get/contacts", type:"GET", dataType:"json"})
-                        .done(function(data){
-                            for(var i = 0; i < data.length; i++){
-                            document.getElementById("dropdown").innerHTML += '<option value="contact">'+data[i]+'</option>';
-                        }
-                    });
-
-                        if(json[i].to[0] == "Katayoun") {
+                    for(var i = 0; i<json.length; i++) {
+                        if (json[i].to[0] == "Katayoun") {
                             event.dates.push(new Date(json[i].date));
                         }
-
+                    }
                 });
 
 {#                var max =  Math.floor(Math.random() * 200);#}
@@ -71,9 +69,9 @@
 
 
 
-            for (var i = 0; i < 2; i++) {
-                data.push(createEvent(names[i]));
-            }
+{#            for (var i = 0; i < 2; i++) {#}
+{#                data.push(createEvent(names[i]));#}
+{#            }#}
 
             var color = d3.scale.category20();
 
@@ -98,8 +96,8 @@
                 .eventColor(function (datum, index) {
                     return color(index);
                 })
-                .width(1000)
-                .margin({ top: 100, left: 200, bottom: 0, right: 0 })
+                .width(1100)
+                .margin({ top: 100, left: 400, bottom: 0, right: 0 })
                 .axisFormat(function(xAxis) {
                     xAxis.ticks(5);
                 })
@@ -119,8 +117,10 @@
             var addLine = function () {
                 var data = element.datum();
                 var i = data.length;
-                console.log(i);
-                data.push(createEvent(names[i]));
+                var selected = document.getElementById("dropdown").value;
+                console.log(selected);
+                data.push(createEvent(names[i]+selected));
+                data.push(createEvent(names[i+1]+selected));
                 element = element.datum(data);
                 graph(element);
             }
