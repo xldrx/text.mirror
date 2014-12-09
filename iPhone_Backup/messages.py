@@ -2,9 +2,11 @@
 # coding=utf-8
 import csv
 import json
+import pickle
 import re
 import dateutil.parser
 from iPhone_Backup.contacts import get_contacts
+from iPhone_Backup.location import get_location
 
 __author__ = 'xl'
 
@@ -91,16 +93,38 @@ def add_sender_status(messages):
 
 
 def fix_dates(messages):
-    for m in data:
+    for m in messages:
         m['date'] = dateutil.parser.parse(m['date'])
     return messages
 
+def add_location(messages):
+    for m in messages:
+        m['location'] = get_location(m['date'])
+    return messages
+
+
+def save_object(ret, name):
+    with open(name, "wb") as fp:
+        pickle.dump(ret, fp)
+
+
 def get_processed_messages():
+    return load_processed_messages()
     ret = filter_message()
     ret = add_gender(ret)
     ret = add_sender_status(ret)
+    ret = add_location(ret)
+    save_object(ret, "cache.pickle")
     return ret
 
+
+def load_object(name):
+    with open(name, "rb") as fp:
+        return pickle.load(fp)
+
+
+def load_processed_messages():
+    return load_object("cache.pickle")
 
 if __name__ == "__main__":
     data = get_processed_messages()

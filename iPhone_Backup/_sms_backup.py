@@ -35,6 +35,8 @@ import tempfile
 from datetime import datetime
 
 # argparse isn't in standard library until 2.7
+import pytz
+
 try:
     test = argparse.ArgumentParser()
 except NameError:
@@ -446,7 +448,7 @@ def imessage_date(row):
 
 def convert_date(unix_date, format):
     """Convert unix epoch time string to formatted date string."""
-    dt = datetime.fromtimestamp(int(unix_date))
+    dt = datetime.fromtimestamp(int(unix_date), tz=pytz.timezone("US/Eastern"))
     #XL
     return dt
     # ds = dt.strftime(format)

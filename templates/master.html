@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="An CS467KGK project.">
+
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css" />
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="/static/js/animatescroll.min.js"></script>
+    <script src="http://code.highcharts.com/highcharts.js"></script>
+    <script src="http://code.highcharts.com/modules/exporting.js"></script>
+
+    <script src="/static/js/jQDateRangeSlider-min.js"></script>
+    <link href="/static/css/iThing-min.css" rel="stylesheet" />
+
+    <script src="/static/js/jquery.bxslider.min.js"></script>
+    <link href="/static/css/jquery.bxslider.css" rel="stylesheet" />
+
+
+    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css">
+    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/grids-responsive-min.css">
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+    <link rel="stylesheet" href="/static/css/master.css">
+
+    <title>Message.Mirror</title>
+
+</head>
+<body>
+
+<div class="header">
+    <div class="home-menu pure-menu pure-menu-open pure-menu-horizontal pure-menu-fixed">
+        <a class="pure-menu-heading" href=""><b>Message.</b>Mirror</a>
+
+        <ul>
+            <li class="pure-menu-selected"><a onclick="$('body').animatescroll();">Configuration</a></li>
+            <li><a onclick="$('#overview').animatescroll();">Overview</a></li>
+            <li><a onclick="$('#time').animatescroll();">Time</a></li>
+            <li><a onclick="$('#location').animatescroll();">Location</a></li>
+            <li><a onclick="$('#timeline').animatescroll();">Timeline</a></li>
+        </ul>
+    </div>
+</div>
+
+<div class="splash-container" id="background">
+
+    <div class="splash" id="configuration">
+        <h1 class="splash-head">
+            Select Date Range
+            <br/>
+            <br/>
+            <div id="datePicker"></div>
+
+        </h1>
+
+        <p class="splash-subhead">
+        </p>
+
+        <p>
+            <a onclick="alert('it works!')" class="pure-button pure-button-primary">Compute</a>
+        </p>
+    </div>
+</div>
+
+<div class="content-wrapper">
+    <div class="content fullscreen-90" id="overview">
+        <h2 class="content-head is-center">Overview</h2>
+        <div class="" id="overview-div"></div>
+    </div>
+
+    <div class="content fullscreen-90" id="time">
+{#        <h2 class="content-head is-center">Time</h2>#}
+        <ul class="bxslider" id="time-div">
+          <li><div class="time-div" id="time-div-3"></div></li>
+          <li><div class="time-div" id="time-div-2"></div></li>
+          <li><div class="time-div" id="time-div-1"></div></li>
+        </ul>
+
+    </div>
+
+    <div class="content fullscreen-90" id="location">
+        <div id="map-canvas" style="width: 100%; height: 100%;"></div>
+    </div>
+
+{#    <div class="content fullscreen-90" id="timeline">#}
+{#            <h2 class="content-head is-center">Laboris nisi ut aliquip.</h2>#}
+{##}
+{#            <p>#}
+{#                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod#}
+{#                tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,#}
+{#                quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo#}
+{#                consequat. Duis aute irure dolor.#}
+{#            </p>#}
+{#    </div>#}
+
+{#    <div class="content">#}
+{#        <h2 class="content-head is-center">Dolore magna aliqua. Uis aute irure.</h2>#}
+{##}
+{#        <div class="pure-g">#}
+{#            <div class="l-box-lrg pure-u-1 pure-u-md-2-5">#}
+{#                <form class="pure-form pure-form-stacked">#}
+{#                    <fieldset>#}
+{##}
+{#                        <label for="name">Your Name</label>#}
+{#                        <input id="name" type="text" placeholder="Your Name">#}
+{##}
+{##}
+{#                        <label for="email">Your Email</label>#}
+{#                        <input id="email" type="email" placeholder="Your Email">#}
+{##}
+{#                        <label for="password">Your Password</label>#}
+{#                        <input id="password" type="password" placeholder="Your Password">#}
+{##}
+{#                        <button type="submit" class="pure-button">Sign Up</button>#}
+{#                    </fieldset>#}
+{#                </form>#}
+{#            </div>#}
+{##}
+{#            <div class="l-box-lrg pure-u-1 pure-u-md-3-5">#}
+{#                <h4>Contact Us</h4>#}
+{##}
+{#                <p>#}
+{#                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod#}
+{#                    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,#}
+{#                    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo#}
+{#                    consequat.#}
+{#                </p>#}
+{##}
+{#                <h4>More Information</h4>#}
+{##}
+{#                <p>#}
+{#                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod#}
+{#                    tempor incididunt ut labore et dolore magna aliqua.#}
+{#                </p>#}
+{#            </div>#}
+{#        </div>#}
+{##}
+{#    </div>#}
+
+    <div class="footer l-box is-center">
+        Sayed <b>Hadi</b> Hashemi | <b>Sadaf</b> Tayefeh
+    </div>
+
+</div>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization"></script>
+    <script src="/static/js/sec/overview.js"></script>
+    <script src="/static/js/maps-styles.js"></script>
+    <script src="/static/js/sec/location.js"></script>
+    <script src="/static/js/sec/time.js"></script>
+    <script src="/static/js/sec/utils.js"></script>
+    <script>
+    </script>
+</body>
+</html>
