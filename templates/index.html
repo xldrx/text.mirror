@@ -11,9 +11,12 @@
     </head>
     <body>
         <h1>Text Mirror</h1>
-        <p>Charts can have custom color lines, width, margins, date locale, etc. Check the source to see how to customize a <code>d3.chart.eventDrops()</code>.</p>
+        <p>A tool for analyzing your text messages!</p>
         <div style="text-align: center">
-            <label for="delimiter">Show time boundaries:</label>
+            <label for="delimiter">Choose a contact:</label>
+            <select id="dropdown">
+                <option value="Sadaf">Sadaf</option>
+            </select>
             <input name="delimiter" type="checkbox" checked="true" onchange="updateDelimiter()">
             <button onclick="addLine()">Add line</button>
             <button onclick="removeLine()">Remove line</button>
@@ -22,32 +25,53 @@
         <div style="text-align: center" id="legend"></div>
         <script src="/static/js/d3.min.js"></script>
         <script src="/static/js/eventDrops.js"></script>
+        <script src="/static/js/jquery-1.11.1.min.js"></script>
+        <script src="/static/js/jquery-ui.js"></script>
+
         <script>
             var chartPlaceholder = document.getElementById('chart_placeholder');
-            var names = ["Received", "Sent", "SQL queries", "Cache invalidations", "Cache miss", "Builds", "Websocket messages", "API calls", "Autoscaling", "Incidents", "Explosions", "Ends of the world"];
+            var names = ["Received Messages: ", "Sent Messages: ", "Received Messages: ", "Sent Messages: ", "Received Messages: ", "Sent Messages: ", "Received Messages: ", "Sent Messages: ","Received Messages: ", "Sent Messages: ","Received Messages: ", "Sent Messages: "];
 
             var data = [];
             var endTime = Date.now();
             var oneMonth = 30 * 24 * 60 * 60 * 1000;
             var startTime = endTime - oneMonth;
+            $.ajax({url:"/get/contacts", type:"GET", dataType:"json"})
+                .done(function(data){
+                    for(var i = 0; i < data.length; i++){
+                    document.getElementById("dropdown").innerHTML += '<option value="'+data[i][1]+'">'+data[i][1]+'</option>';
+                }
+            });
+
+
 
             function createEvent (name) {
                 var event = {};
                 event.name = name;
                 event.dates = [];
+                d3.json("/static/messages.json", function(error, json) {
+                    for(var i = 0; i<json.length; i++) {
+                        if (json[i].to[0] == "Katayoun") {
+                            event.dates.push(new Date(json[i].date));
+                        }
+                    }
+                });
 
-                var max =  Math.floor(Math.random() * 200);
-                for (var j = 0; j < max; j++) {
-                    var time = Math.floor((Math.random() * oneMonth)) + startTime;
-                    event.dates.push(new Date(time));
-                }
+{#                var max =  Math.floor(Math.random() * 200);#}
+{#                for (var j = 0; j < max; j++) {#}
+{#                    var time = Math.floor((Math.random() * oneMonth)) + startTime;#}
+{#                    console.log(new Date(time));#}
+{#                    event.dates.push(new Date(time));#}
+{#                }#}
 
                 return event;
             }
 
-            for (var i = 0; i < 6; i++) {
-                data.push(createEvent(names[i]));
-            }
+
+
+{#            for (var i = 0; i < 2; i++) {#}
+{#                data.push(createEvent(names[i]));#}
+{#            }#}
 
             var color = d3.scale.category20();
 
@@ -72,8 +96,8 @@
                 .eventColor(function (datum, index) {
                     return color(index);
                 })
-                .width(800)
-                .margin({ top: 100, left: 200, bottom: 0, right: 0 })
+                .width(1100)
+                .margin({ top: 100, left: 400, bottom: 0, right: 0 })
                 .axisFormat(function(xAxis) {
                     xAxis.ticks(5);
                 })
@@ -93,8 +117,11 @@
             var addLine = function () {
                 var data = element.datum();
                 var i = data.length;
-                data.push(createEvent(names[i]));
-                elements = element.datum(data);
+                var selected = document.getElementById("dropdown").value;
+                console.log(selected);
+                data.push(createEvent(names[i]+selected));
+                data.push(createEvent(names[i+1]+selected));
+                element = element.datum(data);
                 graph(element);
             }
 
