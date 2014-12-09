@@ -23,8 +23,7 @@ init()
 def get_contacts():
     return list(enumerate(contacts))
 
-
-def get_messages(include_sends=True, include_recieves=True, from_date=None, to_date=None, only_from=[]):
+def get_message_list(include_sends=True, include_recieves=True, from_date=None, to_date=None, only_from=[]):
     ret = []
     from_date = dateutil.parser.parse(from_date) if from_date and isinstance(from_date, unicode) else from_date
     to_date = dateutil.parser.parse(to_date) if to_date and isinstance(to_date, unicode) else to_date
@@ -41,15 +40,24 @@ def get_messages(include_sends=True, include_recieves=True, from_date=None, to_d
         if not include_recieves and m['to'] == 'Me':
             continue
 
-        if to_date and m['date'] > to_date:
+        if to_date and m['date'].date() > to_date.date():
             continue
 
-        if from_date and m['date'] < from_date:
+        if from_date and m['date'].date() < from_date.date():
             continue
 
         if len(only_from) > 0 and m['to'] not in only_from and m['from'] not in only_from:
             continue
 
+        ret.append(m)
+
+    return ret
+
+
+
+def get_messages(message_list):
+    ret = []
+    for m in message_list:
         record = deepcopy(m)
         record['date'] = record['date'].isoformat()
 
@@ -58,50 +66,50 @@ def get_messages(include_sends=True, include_recieves=True, from_date=None, to_d
     return ret
 
 
-def get_overview():
+def get_overview(message_list):
     return [
         [{
              "name": 'Girls',
-             "count": len([m for m in data if 'gender' in m and m['gender'] == 'f'])
+             "count": len([m for m in message_list if 'gender' in m and m['gender'] == 'f'])
          },
          {
              "name": 'Boys',
-             "count": len([m for m in data if 'gender' in m and m['gender'] == 'm'])
+             "count": len([m for m in message_list if 'gender' in m and m['gender'] == 'm'])
          }],
 
         [{
              "name": 'Girls',
-             "count": len([m for m in data if 'gender' in m and m['gender'] == 'f' and m['is_sender']])
+             "count": len([m for m in message_list if 'gender' in m and m['gender'] == 'f' and m['is_sender']])
          },
          {
              "name": 'Boys',
-             "count": len([m for m in data if 'gender' in m and m['gender'] == 'm' and m['is_sender']])
+             "count": len([m for m in message_list if 'gender' in m and m['gender'] == 'm' and m['is_sender']])
          }],
 
         [{
              "name": 'Girls',
-             "count": len([m for m in data if 'gender' in m and m['gender'] == 'f' and not m['is_sender']])
+             "count": len([m for m in message_list if 'gender' in m and m['gender'] == 'f' and not m['is_sender']])
          },
          {
              "name": 'Boys',
-             "count": len([m for m in data if 'gender' in m and m['gender'] == 'm' and not m['is_sender']])
+             "count": len([m for m in message_list if 'gender' in m and m['gender'] == 'm' and not m['is_sender']])
          }],
 
 
     ]
 
 
-def get_locations():
+def get_locations(message_list):
     return [
-        [{'lng': m['location'][0], 'lat': m['location'][1]} for m in data if m['location']],
-        [{'lng': m['location'][0], 'lat': m['location'][1]} for m in data if
+        [{'lng': m['location'][0], 'lat': m['location'][1]} for m in message_list if m['location']],
+        [{'lng': m['location'][0], 'lat': m['location'][1]} for m in message_list if
          m['location'] and 'gender' in m and m['gender'] == 'm'],
-        [{'lng': m['location'][0], 'lat': m['location'][1]} for m in data if
+        [{'lng': m['location'][0], 'lat': m['location'][1]} for m in message_list if
          m['location'] and 'gender' in m and m['gender'] == 'f']
     ]
 
 
-def get_times():
+def get_times(message_list):
     ret = [
         [
             [0] * 7,
@@ -121,7 +129,7 @@ def get_times():
     ]
     time_dict = [[], [], []]
 
-    for m in data:
+    for m in message_list:
         ret[0][0][m['date'].weekday()] += 1
         ret[0][1][m['date'].hour] += 1
         ret[0][2][m['date'].month - 1] += 1
@@ -140,7 +148,7 @@ def get_times():
             "id": i,
             "gender":"m",
             "count": ret[1][2][i],
-            "percentage": 1.0 * ret[1][2][i] / (ret[1][2][i]+ret[2][2][i])
+            "percentage": 1.0 * ret[1][2][i] / (ret[1][2][i]+ret[2][2][i]) if (ret[1][2][i]+ret[2][2][i]) > 0 else 0
         })
 
         time_dict[2].append({
@@ -148,7 +156,7 @@ def get_times():
             "id": i,
             "gender": "f",
             "count": ret[2][2][i],
-            "percentage": 1.0 * ret[2][2][i] / (ret[1][2][i]+ret[2][2][i])
+            "percentage": 1.0 * ret[2][2][i] / (ret[1][2][i]+ret[2][2][i]) if (ret[1][2][i]+ret[2][2][i]) > 0 else 0
         })
 
     for i in range(24):
@@ -157,7 +165,7 @@ def get_times():
             "id": i,
             "gender":"m",
             "count": ret[1][1][i],
-            "percentage": 1.0 * ret[1][1][i] / (ret[1][1][i]+ret[2][1][i])
+            "percentage": 1.0 * ret[1][1][i] / (ret[1][1][i]+ret[2][1][i]) if (ret[1][1][i]+ret[2][1][i]) > 0 else 0
         })
 
         time_dict[1].append({
@@ -165,7 +173,7 @@ def get_times():
             "id": i,
             "gender": "f",
             "count": ret[2][1][i],
-            "percentage": 1.0 * ret[2][1][i] / (ret[1][1][i]+ret[2][1][i])
+            "percentage": 1.0 * ret[2][1][i] / (ret[1][1][i]+ret[2][1][i]) if (ret[1][1][i]+ret[2][1][i]) > 0 else 0
         })
 
     for i in range(7):
@@ -174,7 +182,7 @@ def get_times():
             "id": i,
             "gender":"m",
             "count": ret[1][0][i],
-            "percentage": 1.0 * ret[1][0][i] / (ret[1][0][i]+ret[2][0][i])
+            "percentage": 1.0 * ret[1][0][i] / (ret[1][0][i]+ret[2][0][i]) if (ret[1][0][i]+ret[2][0][i]) > 0 else 0
         })
 
         time_dict[0].append({
@@ -182,7 +190,7 @@ def get_times():
             "id": i,
             "gender": "f",
             "count": ret[2][0][i],
-            "percentage": 1.0 * ret[2][0][i] / (ret[1][0][i]+ret[2][0][i])
+            "percentage": 1.0 * ret[2][0][i] / (ret[1][0][i]+ret[2][0][i]) if (ret[1][0][i]+ret[2][0][i]) >0 else 0
         })
 
     return ret, time_dict

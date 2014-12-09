@@ -315,17 +315,17 @@ a.pure-button-primary {
     height: 80%;
 }
 
-#time-div {
-    margin: 0 auto;
-    width: 80%;
-    height: 100%;
-}
+/*#time-div {*/
+    /*margin: 0 auto;*/
+    /*width: 80%;*/
+    /*height: 100%;*/
+/*}*/
 
-.time-div {
-    margin: 0 auto;
-    width: 80%;
-    height: 70vh;
-}
+/*.time-div {*/
+    /*margin: 0 auto;*/
+    /*width: 80%;*/
+    /*height: 70vh;*/
+/*}*/
 
 .svg-container {
     display: inline-block;
@@ -340,4 +340,20 @@ a.pure-button-primary {
     position: absolute;
     top: 10px;
     left: 0;
+}
+
+.slider{
+    width: 100%;
+    height: 80%;
+    overflow: hidden;
+    position: relative;
+}
+
+.slide{
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    float: left;
+    position: absolute;
 }
